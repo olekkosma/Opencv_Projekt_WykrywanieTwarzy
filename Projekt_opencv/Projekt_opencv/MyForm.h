@@ -41,6 +41,8 @@ namespace Projektopencv {
 	Mat frame, frame_gray;
 	vector<Rect> faces;
 	string videoPathStr;
+	string imagePathStr ="";
+	boolean useImage = false;
 	string destinationPath;
 	string face_cascade_path = "C:\\Users\\Ukleja\\Desktop\\Opencv\\Projekt_opencv\\haarcascade_frontalface_alt.xml";
 	string eyes_cascade_path = "C:\\Users\\Ukleja\\Desktop\\Opencv\\Projekt_opencv\\haarcascade_eye_tree_eyeglasses.xml";
@@ -100,6 +102,12 @@ namespace Projektopencv {
 	private: System::Windows::Forms::Panel^  panel2;
 	private: System::Windows::Forms::Button^  saveImageButton;
 	private: System::Windows::Forms::Label^  label3;
+	private: System::Windows::Forms::Button^  imageToReplaceButton;
+	private: System::Windows::Forms::Label^  label5;
+	private: System::Windows::Forms::Label^  imagePath;
+	private: System::Windows::Forms::CheckBox^  checkBox1;
+	private: System::Windows::Forms::Label^  label4;
+
 
 	private: System::ComponentModel::IContainer^  components;
 
@@ -130,6 +138,11 @@ namespace Projektopencv {
 			this->RecordImagesRadioButton = (gcnew System::Windows::Forms::RadioButton());
 			this->framesCheckBox = (gcnew System::Windows::Forms::CheckBox());
 			this->panel1 = (gcnew System::Windows::Forms::Panel());
+			this->checkBox1 = (gcnew System::Windows::Forms::CheckBox());
+			this->label4 = (gcnew System::Windows::Forms::Label());
+			this->label5 = (gcnew System::Windows::Forms::Label());
+			this->imagePath = (gcnew System::Windows::Forms::Label());
+			this->imageToReplaceButton = (gcnew System::Windows::Forms::Button());
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->panel2 = (gcnew System::Windows::Forms::Panel());
 			this->saveImageButton = (gcnew System::Windows::Forms::Button());
@@ -243,7 +256,7 @@ namespace Projektopencv {
 			this->framesTosaveText->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F));
 			this->framesTosaveText->Location = System::Drawing::Point(396, 41);
 			this->framesTosaveText->Name = L"framesTosaveText";
-			this->framesTosaveText->Size = System::Drawing::Size(131, 25);
+			this->framesTosaveText->Size = System::Drawing::Size(150, 25);
 			this->framesTosaveText->TabIndex = 8;
 			this->framesTosaveText->Text = L"5";
 			this->framesTosaveText->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
@@ -280,8 +293,9 @@ namespace Projektopencv {
 			this->videoPath->ForeColor = System::Drawing::SystemColors::ButtonHighlight;
 			this->videoPath->Location = System::Drawing::Point(49, 3);
 			this->videoPath->Name = L"videoPath";
-			this->videoPath->Size = System::Drawing::Size(0, 18);
+			this->videoPath->Size = System::Drawing::Size(39, 18);
 			this->videoPath->TabIndex = 11;
+			this->videoPath->Text = L"Path:";
 			this->videoPath->TextAlign = System::Drawing::ContentAlignment::MiddleRight;
 			// 
 			// selectDestinationButton
@@ -291,7 +305,7 @@ namespace Projektopencv {
 			this->selectDestinationButton->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F));
 			this->selectDestinationButton->Location = System::Drawing::Point(6, 22);
 			this->selectDestinationButton->Name = L"selectDestinationButton";
-			this->selectDestinationButton->Size = System::Drawing::Size(281, 44);
+			this->selectDestinationButton->Size = System::Drawing::Size(192, 44);
 			this->selectDestinationButton->TabIndex = 12;
 			this->selectDestinationButton->Text = L"Select destination folder";
 			this->selectDestinationButton->UseVisualStyleBackColor = false;
@@ -379,7 +393,7 @@ namespace Projektopencv {
 			// framesCheckBox
 			// 
 			this->framesCheckBox->AutoSize = true;
-			this->framesCheckBox->Location = System::Drawing::Point(512, 24);
+			this->framesCheckBox->Location = System::Drawing::Point(531, 23);
 			this->framesCheckBox->Name = L"framesCheckBox";
 			this->framesCheckBox->Size = System::Drawing::Size(15, 14);
 			this->framesCheckBox->TabIndex = 23;
@@ -390,6 +404,11 @@ namespace Projektopencv {
 			// 
 			this->panel1->BackColor = System::Drawing::Color::Gray;
 			this->panel1->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			this->panel1->Controls->Add(this->checkBox1);
+			this->panel1->Controls->Add(this->label4);
+			this->panel1->Controls->Add(this->label5);
+			this->panel1->Controls->Add(this->imagePath);
+			this->panel1->Controls->Add(this->imageToReplaceButton);
 			this->panel1->Controls->Add(this->label3);
 			this->panel1->Controls->Add(this->saveRecordLabel);
 			this->panel1->Controls->Add(this->startRecordingButton);
@@ -404,13 +423,72 @@ namespace Projektopencv {
 			this->panel1->Size = System::Drawing::Size(771, 71);
 			this->panel1->TabIndex = 24;
 			// 
+			// checkBox1
+			// 
+			this->checkBox1->AutoSize = true;
+			this->checkBox1->Location = System::Drawing::Point(531, 3);
+			this->checkBox1->Name = L"checkBox1";
+			this->checkBox1->Size = System::Drawing::Size(15, 14);
+			this->checkBox1->TabIndex = 30;
+			this->checkBox1->UseVisualStyleBackColor = true;
+			this->checkBox1->CheckedChanged += gcnew System::EventHandler(this, &MyForm::checkBox1_CheckedChanged_1);
+			// 
+			// label4
+			// 
+			this->label4->AutoSize = true;
+			this->label4->BackColor = System::Drawing::Color::Gray;
+			this->label4->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F, System::Drawing::FontStyle::Bold));
+			this->label4->ForeColor = System::Drawing::SystemColors::ButtonHighlight;
+			this->label4->Location = System::Drawing::Point(393, 1);
+			this->label4->Name = L"label4";
+			this->label4->Size = System::Drawing::Size(125, 18);
+			this->label4->TabIndex = 29;
+			this->label4->Text = L"replace by image";
+			this->label4->Click += gcnew System::EventHandler(this, &MyForm::label4_Click);
+			// 
+			// label5
+			// 
+			this->label5->AutoSize = true;
+			this->label5->BackColor = System::Drawing::Color::Gray;
+			this->label5->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F));
+			this->label5->ForeColor = System::Drawing::SystemColors::ButtonHighlight;
+			this->label5->Location = System::Drawing::Point(201, 1);
+			this->label5->Name = L"label5";
+			this->label5->Size = System::Drawing::Size(39, 18);
+			this->label5->TabIndex = 28;
+			this->label5->Text = L"Path:";
+			// 
+			// imagePath
+			// 
+			this->imagePath->AutoSize = true;
+			this->imagePath->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F));
+			this->imagePath->ForeColor = System::Drawing::SystemColors::ButtonHighlight;
+			this->imagePath->Location = System::Drawing::Point(235, 1);
+			this->imagePath->Name = L"imagePath";
+			this->imagePath->Size = System::Drawing::Size(0, 18);
+			this->imagePath->TabIndex = 27;
+			this->imagePath->TextAlign = System::Drawing::ContentAlignment::MiddleRight;
+			// 
+			// imageToReplaceButton
+			// 
+			this->imageToReplaceButton->BackColor = System::Drawing::SystemColors::ButtonHighlight;
+			this->imageToReplaceButton->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+			this->imageToReplaceButton->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F));
+			this->imageToReplaceButton->Location = System::Drawing::Point(204, 22);
+			this->imageToReplaceButton->Name = L"imageToReplaceButton";
+			this->imageToReplaceButton->Size = System::Drawing::Size(183, 44);
+			this->imageToReplaceButton->TabIndex = 24;
+			this->imageToReplaceButton->Text = L"Select image to replace";
+			this->imageToReplaceButton->UseVisualStyleBackColor = false;
+			this->imageToReplaceButton->Click += gcnew System::EventHandler(this, &MyForm::imageToReplaceButton_Click);
+			// 
 			// label3
 			// 
 			this->label3->AutoSize = true;
 			this->label3->BackColor = System::Drawing::Color::Gray;
 			this->label3->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F));
 			this->label3->ForeColor = System::Drawing::SystemColors::ButtonHighlight;
-			this->label3->Location = System::Drawing::Point(3, 0);
+			this->label3->Location = System::Drawing::Point(3, 3);
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(39, 18);
 			this->label3->TabIndex = 19;
@@ -482,8 +560,8 @@ namespace Projektopencv {
 		}
 		System::String^ directoryPath = dgOpen->FileName;
 
-		if (directoryPath->Length > 38) {
-			videoPath->Text = directoryPath->Substring(directoryPath->Length - 38, 38);
+		if (directoryPath->Length > 33) {
+			videoPath->Text = "..." +  directoryPath->Substring(directoryPath->Length - 33, 33);
 		}
 		else {
 			videoPath->Text = directoryPath;
@@ -539,10 +617,7 @@ namespace Projektopencv {
 			 }
 		size = 1;
 		}
-		if (size != 0) {
-			 cout << "x face " + to_string(faces[0].x + faces[0].width / 2) << endl;
-			 cout << "y face " + to_string(faces[0].y + faces[0].height / 2) << endl;
-		}
+
 		for (int i = 0; i < size; i++) {
 			Rect face_area = faces[i]; 
 			Mat faceROI = frame_gray(faces[i]);
@@ -565,8 +640,14 @@ namespace Projektopencv {
 				break;
 			case 4:
 				if (faces.size() > 1) {
-					for (int j = 1; j < faces.size(); j++) {
-						frame2 = frame(face_area);
+					for (int j = 0; j < faces.size(); j++) {
+						if (imagePathStr != "" && useImage==true) {
+							Mat imageFromPath = imread(imagePathStr, 1);
+							frame2 = imageFromPath.clone();
+						}
+						else {
+							frame2 = frame(face_area);
+						}
 						resize(frame2, frame2, cv::Size(faces[j].width, faces[j].height));
 						Rect WhereRec(faces[j].x, faces[j].y, frame2.cols, frame2.rows);
 						frame2.copyTo(frame(WhereRec));
@@ -748,8 +829,8 @@ namespace Projektopencv {
 		destinationPath = ReplaceAll(destinationPath, std::string("\\"), std::string("\\\\"));
 		cout << destinationPath << endl;
 
-		if (directoryPath->Length > 38) {
-			saveRecordLabel->Text = directoryPath->Substring(directoryPath->Length - 38, 38);
+		if (directoryPath->Length > 18) {
+			saveRecordLabel->Text = "..." + directoryPath->Substring(directoryPath->Length - 18, 18);
 		}
 		else {
 			saveRecordLabel->Text = directoryPath;
@@ -842,6 +923,37 @@ namespace Projektopencv {
 		frame = original.clone();
 		proccessImage();
 	}
-	};
+	private: System::Void imageToReplaceButton_Click(System::Object^  sender, System::EventArgs^  e) {
+		OpenFileDialog^ dgOpen = gcnew OpenFileDialog();
+		dgOpen->Filter = "All files(*.*)|*.*||";
+		if (dgOpen->ShowDialog() == System::Windows::Forms::DialogResult::Cancel) {
+			return;
+		}
+		System::String^ directoryPath = dgOpen->FileName;
+
+		if (directoryPath->Length > 18) {
+			imagePath->Text = "..." +  directoryPath->Substring(directoryPath->Length - 18, 18);
+		}
+		else {
+			imagePath->Text = directoryPath;
+		}
+
+		imagePathStr = msclr::interop::marshal_as<std::string>(directoryPath);
+	}
+private: System::Void checkBox1_CheckedChanged_1(System::Object^  sender, System::EventArgs^  e) {
+	if (useImage == false) {
+		useImage = true;
+		frame = original.clone();
+		proccessImage();
+	}
+	else {
+		useImage = false;
+		frame = original.clone();
+		proccessImage();
+	}
+}
+private: System::Void label4_Click(System::Object^  sender, System::EventArgs^  e) {
+}
+};
 }
 
