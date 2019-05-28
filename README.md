@@ -23,3 +23,6 @@ Funkcje programu:
 * zatrzymywanie klatki 
 * przelączanie filtrów w czasie rzeczywistym oraz na stop-klatce
 * łączenie dwóch różnych źródeł wideo( plik oraz kamera) w jedno nagranie, skalując obraz do pierwszego źródła.
+
+Poglądowe zdjęcie UI:
+![UI aplikacji](https://i.imgur.com/QKnn7Ef.png)
