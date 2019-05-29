@@ -13,6 +13,9 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include <msclr\marshal_cppstd.h>
 #include <algorithm>
+#include <chrono>
+#include <time.h>
+#include <iomanip>
 namespace Projektopencv {
 
 	using namespace System;
@@ -35,6 +38,7 @@ namespace Projektopencv {
 	int choice = 0;
 	int mouseX = 0;
 	int mouseY = 0;
+	int delay = 24 * 5;
 	VideoCapture cap;
 	VideoWriter oVideoWriter;
 	Mat frame2, original;
@@ -48,6 +52,7 @@ namespace Projektopencv {
 	string eyes_cascade_path = "C:\\Users\\Ukleja\\Desktop\\Opencv\\Projekt_opencv\\haarcascade_eye_tree_eyeglasses.xml";
 	CascadeClassifier face_cascade;
 	CascadeClassifier eyes_cascade;
+	chrono::steady_clock sc;
 
 	public ref class MyForm : public System::Windows::Forms::Form
 	{
@@ -107,6 +112,7 @@ namespace Projektopencv {
 	private: System::Windows::Forms::Label^  imagePath;
 	private: System::Windows::Forms::CheckBox^  checkBox1;
 	private: System::Windows::Forms::Label^  label4;
+	private: System::Windows::Forms::Button^  motionDetectorButton;
 
 
 	private: System::ComponentModel::IContainer^  components;
@@ -146,6 +152,7 @@ namespace Projektopencv {
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->panel2 = (gcnew System::Windows::Forms::Panel());
 			this->saveImageButton = (gcnew System::Windows::Forms::Button());
+			this->motionDetectorButton = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->imageWindow))->BeginInit();
 			this->panel1->SuspendLayout();
 			this->panel2->SuspendLayout();
@@ -205,7 +212,7 @@ namespace Projektopencv {
 			this->BlurButton->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F));
 			this->BlurButton->Location = System::Drawing::Point(857, 77);
 			this->BlurButton->Name = L"BlurButton";
-			this->BlurButton->Size = System::Drawing::Size(67, 238);
+			this->BlurButton->Size = System::Drawing::Size(67, 151);
 			this->BlurButton->TabIndex = 3;
 			this->BlurButton->Text = L"Blur";
 			this->BlurButton->UseVisualStyleBackColor = false;
@@ -216,9 +223,9 @@ namespace Projektopencv {
 			this->BlackLineButton->BackColor = System::Drawing::SystemColors::Control;
 			this->BlackLineButton->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 			this->BlackLineButton->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F));
-			this->BlackLineButton->Location = System::Drawing::Point(857, 321);
+			this->BlackLineButton->Location = System::Drawing::Point(857, 234);
 			this->BlackLineButton->Name = L"BlackLineButton";
-			this->BlackLineButton->Size = System::Drawing::Size(67, 232);
+			this->BlackLineButton->Size = System::Drawing::Size(67, 170);
 			this->BlackLineButton->TabIndex = 4;
 			this->BlackLineButton->Text = L"Black line";
 			this->BlackLineButton->UseVisualStyleBackColor = false;
@@ -523,6 +530,19 @@ namespace Projektopencv {
 			this->saveImageButton->UseVisualStyleBackColor = false;
 			this->saveImageButton->Click += gcnew System::EventHandler(this, &MyForm::saveImageButton_Click);
 			// 
+			// motionDetectorButton
+			// 
+			this->motionDetectorButton->BackColor = System::Drawing::SystemColors::Control;
+			this->motionDetectorButton->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
+			this->motionDetectorButton->Font = (gcnew System::Drawing::Font(L"Noto Sans", 9.75F));
+			this->motionDetectorButton->Location = System::Drawing::Point(857, 410);
+			this->motionDetectorButton->Name = L"motionDetectorButton";
+			this->motionDetectorButton->Size = System::Drawing::Size(67, 143);
+			this->motionDetectorButton->TabIndex = 26;
+			this->motionDetectorButton->Text = L"Motion detect";
+			this->motionDetectorButton->UseVisualStyleBackColor = false;
+			this->motionDetectorButton->Click += gcnew System::EventHandler(this, &MyForm::motionDetectorButton_Click);
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(96, 96);
@@ -532,6 +552,7 @@ namespace Projektopencv {
 				static_cast<System::Int32>(static_cast<System::Byte>(44)));
 			this->BackgroundImageLayout = System::Windows::Forms::ImageLayout::None;
 			this->ClientSize = System::Drawing::Size(929, 634);
+			this->Controls->Add(this->motionDetectorButton);
 			this->Controls->Add(this->CopyFaceButton);
 			this->Controls->Add(this->PinkCircleButton);
 			this->Controls->Add(this->BlackLineButton);
@@ -579,6 +600,9 @@ namespace Projektopencv {
 	}
 			
 	private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e) {
+		if (!original.empty()) {
+			frame2 = original.clone();
+		}
 		cap >> original;
 		frame = original.clone();
 		proccessImage();
@@ -618,13 +642,14 @@ namespace Projektopencv {
 		size = 1;
 		}
 
+	
 		for (int i = 0; i < size; i++) {
-			Rect face_area = faces[i]; 
-			Mat faceROI = frame_gray(faces[i]);
-			std::vector<Rect> eyes;
-			eyes_cascade.detectMultiScale(faceROI, eyes, 1.1, 2, 0 | CASCADE_SCALE_IMAGE, cv::Size(30, 30));
-			cv::Point left_side(face_area.x, face_area.y + face_area.height / 2);
-			Rect eyes_area(left_side - cv::Point(0, face_area.height / 3), cv::Size(face_area.width, face_area.height / 3));
+				Rect face_area = faces[i];
+				Mat faceROI = frame_gray(faces[i]);
+				std::vector<Rect> eyes;
+				eyes_cascade.detectMultiScale(faceROI, eyes, 1.1, 2, 0 | CASCADE_SCALE_IMAGE, cv::Size(30, 30));
+				cv::Point left_side(face_area.x, face_area.y + face_area.height / 2);
+				Rect eyes_area(left_side - cv::Point(0, face_area.height / 3), cv::Size(face_area.width, face_area.height / 3));
 			switch (choice) {
 			case 1: {
 				cv::Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2);
@@ -653,9 +678,39 @@ namespace Projektopencv {
 						frame2.copyTo(frame(WhereRec));
 					}
 				}
-			 break;
+				break;
 			}
 		}
+
+		if (choice == 5) {
+			if (delay > 0) {
+				delay--;
+			}
+			if (!frame2.empty()) {
+				auto now = std::chrono::system_clock::now();
+				auto in_time_t = std::chrono::system_clock::to_time_t(now);
+				std::stringstream ss;
+				ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S");
+				string aktualnyCzas = ss.str();
+				putText(frame, aktualnyCzas, cv::Point2i(frame.cols - 190, frame.rows - 30), FONT_HERSHEY_PLAIN, 1, Scalar(240, 240, 240), 2);
+				if (montionDetector(frame2, frame)) {
+					delay = 24*5;
+				}
+
+				if (delay>0) {
+					double max = 24 * 5;
+					double multi = (double)delay / max;
+					int color = (150 * multi) + 105;
+					cout << color << endl;
+					putText(frame, "Motion detected", cv::Point2i(30, frame.rows - 30), FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, color), 2);
+				}
+				else {
+					if (oVideoWriter.isOpened())
+					switchRecordingButton();
+				}
+			}
+		}
+
 
 		if (startRecordingButton->Text == L"Stop recording" && imagesToRecord > 0) {
 			if (!frame.empty()) {
@@ -664,9 +719,14 @@ namespace Projektopencv {
 					saveImage();
 				}
 				else {
-					string src = destinationPath + "\\video" + to_string(videoIndex) + ".avi";
+					
 					if (!oVideoWriter.isOpened()){
-
+						auto now = std::chrono::system_clock::now();
+						auto in_time_t = std::chrono::system_clock::to_time_t(now);
+						std::stringstream ss;
+						ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d-%H-%M-%S");
+						string var = "\\video" + ss.str() + ".avi";
+						string src = destinationPath + var;
 						dWidth = frame.cols;
 						dHeight = frame.rows;
 						cv::Size frameSize(static_cast<int>(dWidth), static_cast<int>(dHeight));
@@ -697,6 +757,19 @@ namespace Projektopencv {
 	}
 	}
 
+	bool montionDetector(Mat frame, Mat frame2) {
+		Mat gray1, gray2;
+		Mat diff, blurr_diff, thresh;
+		cvtColor(frame, gray1, COLOR_BGR2GRAY);
+		cvtColor(frame2, gray2, COLOR_BGR2GRAY);
+		absdiff(gray1, gray2, diff);
+		GaussianBlur(diff, blurr_diff, cv::Size(5, 5), 20);
+		threshold(blurr_diff, thresh, 20, 255, THRESH_BINARY);
+		vector<vector<cv::Point> > contours;
+		findContours(thresh, contours, CV_RETR_EXTERNAL, CHAIN_APPROX_NONE);
+		return contours.size() >= 25;
+	}
+
 	private: void saveImage(){
 		vector<int> compression_params;
 		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
@@ -716,7 +789,7 @@ namespace Projektopencv {
 			 PlayCameraRadioButton->Enabled = false;
 			 PlayVideoRadioButton->Enabled = false;
 			 if (!cap.isOpened()) cap.open(0);
-				 cameraButton->Text = L"Stop camera";
+			cameraButton->Text = L"Stop camera";
 			 timer1->Start();
 		} else if (cameraButton->Text == L"Stop camera") {
 				 PlayCameraRadioButton->Enabled = true;
@@ -728,9 +801,9 @@ namespace Projektopencv {
 			}
 		if (cameraButton->Text == L"Run video") {
 					 PlayCameraRadioButton->Enabled = false;
+					 PlayVideoRadioButton->Enabled = false;
 					 if (!cap.isOpened()) cap.open(videoPathStr);
 					 cameraButton->Text = L"Stop video";
-					 PlayVideoRadioButton->Enabled = false;
 					 timer1->Start();
 
 		}
@@ -813,6 +886,8 @@ namespace Projektopencv {
 		 static_cast<System::Int32>(static_cast<System::Byte>(255)));
 		 CopyFaceButton->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(255)), static_cast<System::Int32>(static_cast<System::Byte>(255)),
 		 static_cast<System::Int32>(static_cast<System::Byte>(255)));
+		 motionDetectorButton->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(255)), static_cast<System::Int32>(static_cast<System::Byte>(255)),
+			 static_cast<System::Int32>(static_cast<System::Byte>(255)));
 	}
 
 	private: System::Void textBox1_TextChanged(System::Object^  sender, System::EventArgs^  e) {
@@ -953,6 +1028,20 @@ private: System::Void checkBox1_CheckedChanged_1(System::Object^  sender, System
 	}
 }
 private: System::Void label4_Click(System::Object^  sender, System::EventArgs^  e) {
+}
+private: System::Void motionDetectorButton_Click(System::Object^  sender, System::EventArgs^  e) {
+	resetColors();
+	if (choice != 5) {
+		choice = 5;
+		motionDetectorButton->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(255)), static_cast<System::Int32>(static_cast<System::Byte>(128)),
+			static_cast<System::Int32>(static_cast<System::Byte>(128)));
+	}
+	else choice = 0;
+
+	if (cap.isOpened()) {
+		frame = original.clone();
+		proccessImage();
+	}
 }
 };
 }
